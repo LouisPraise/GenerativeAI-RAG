@@ -14,7 +14,7 @@ def load_query_engine():
     
     # Protecting my grop key api
     api_key = st.secrets["GROQ_API_KEY"] 
-    llm = Groq(model="llama3-8b-8192", api_key=api_key)
+    llm = Groq(model="llama-3.3-70b-versatile", api_key=api_key)
     
     storage_context = StorageContext.from_defaults(persist_dir="./storage")
     index = load_index_from_storage(storage_context, embed_model=embed_model)
