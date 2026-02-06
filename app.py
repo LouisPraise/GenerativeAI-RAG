@@ -41,18 +41,32 @@ if prompt := st.chat_input("YOUR QUESTION..."):
         st.markdown(prompt)
 
     with st.chat_message("assistant"):
-        response = query_engine.query(prompt)
-        st.markdown(response.response)
+        placeholder = st.empty()
+        full_response = ""
+        response = query_engine.query(prompt) 
         
+       
+        for chunk in response.response_gen:
+            full_response += chunk
+            placeholder.markdown(full_response + "▌") 
+        
+        placeholder.markdown(full_response) 
+
         # references
         with st.expander("📚 REFERENCES"):
             for source in response.source_nodes:
                 file_name = source.node.metadata.get('file_name', 'Source inconnue')
-                score = round(source.score, 2) 
-                
+                score = round(source.score, 2)
                 st.write(f"**Fichier :** {file_name} (Pertinence : {score})")
-                st.caption(f"Extrait : {source.node.get_content()[:200]}...") 
+                st.caption(f"Extrait : {source.node.get_content()[:200]}...")
                 st.divider()
 
-        st.session_state.messages.append({"role": "assistant", "content": str(response.response)})
+        st.session_state.messages.append({"role": "assistant", "content": full_response})
+
+
+
+
+       
+        
+
 
