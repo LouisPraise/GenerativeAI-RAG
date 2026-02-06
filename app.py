@@ -1,0 +1,58 @@
+
+import streamlit as st
+import os
+from llama_index.core import StorageContext, load_index_from_storage, Settings
+from llama_index.embeddings.huggingface import HuggingFaceEmbedding
+from llama_index.llms.groq import Groq
+
+#Streamlit interface
+st.set_page_config(page_title="Andrew Ng AI Tutor", page_icon="🎓")
+st.set_page_config(page_title="", page_icon="🎓")
+st.title("🎓 IA Assistant - My courses")
+
+#My model configuration
+@st.cache_resource 
+def load_models():
+    Settings.embed_model = HuggingFaceEmbedding(
+        model_name="sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+    )
+    #My API key protection (I retrieve it from steamlit)
+    api_key = st.secrets["GROQ_API_KEY"] 
+    Settings.llm = Groq(model="llama3-8b-8192", api_key=api_key)
+    
+    storage_context = StorageContext.from_defaults(persist_dir="./storage")
+    index = load_index_from_storage(storage_context)
+    return index.as_query_engine(streaming=True)
+
+query_engine = load_models()
+
+# I want my model to remember the history
+if "messages" not in st.session_state:
+    st.session_state.messages = []
+
+for message in st.session_state.messages:
+    with st.chat_message(message["role"]):
+        st.markdown(message["content"])
+
+    # user interface
+if prompt := st.chat_input("YOUR QUESTION..."):
+    st.session_state.messages.append({"role": "user", "content": prompt})
+    with st.chat_message("user"):
+        st.markdown(prompt)
+
+    with st.chat_message("assistant"):
+        response = query_engine.query(prompt)
+        st.markdown(response.response)
+        
+        # references
+        with st.expander("📚 REFERENCES"):
+            for source in response.source_nodes:
+                file_name = source.node.metadata.get('file_name', 'Source inconnue')
+                score = round(source.score, 2) 
+                
+                st.write(f"**Fichier :** {file_name} (Pertinence : {score})")
+                st.caption(f"Extrait : {source.node.get_content()[:200]}...") 
+                st.divider()
+
+        st.session_state.messages.append({"role": "assistant", "content": str(response.response)})
+
