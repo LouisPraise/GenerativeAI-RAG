@@ -53,9 +53,9 @@ if prompt := st.chat_input("YOUR QUESTION..."):
         with st.expander("📚 REFERENCES"):
             for source in response.source_nodes:
                 file_name = source.node.metadata.get('file_name', 'Source inconnue')
-                score = round(source.score, 2)
-                st.write(f"**Fichier :** {file_name} (Pertinence : {score})")
+                st.write(f"**Fichier :** {file_name}")
                 st.caption(f"Extrait : {source.node.get_content()[:200]}...")
                 st.divider()
 
         st.session_state.messages.append({"role": "assistant", "content": full_response})
+
