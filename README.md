@@ -16,7 +16,7 @@ I decided to build this GenAI tool as my second end-to-end project. It uses **RA
 *   **HuggingFaceEmbeddings**: Used to transform text into semantic vectors (Model: all-MiniLM-L6-v2).
 *   **Python**: The core language of the project.
 
-## 🛠️ 🚀 Key Features
+## 🚀 Key Features
 *   **Semantic Retrieval**: Understands the meaning behind questions (e.g., asking about "preventing overfitting" will find sections on Regularization).
 *   **Ultra-Fast Inference**:  Integration with Groq allows for near-instantaneous responses.
 *   **Contextual Accuracy**: The AI is grounded in the provided PDFs, minimizing hallucinations.
